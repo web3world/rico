@@ -1,57 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rico的数据</title>
-    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/2.6.7/vue.min.js"></script>
-    <style>
-      .item {
-        border: 1px solid red;
-        margin-bottom: 10px;
-        display: flex;
-      }
-      .item span {
-        width: 220px;
-        padding: 10px;
-        border-right: 1px solid red;
-        overflow: hidden;
-      }
-      .text {
-        width: 300px;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="app">
-      {{list.length}}
-      <div
-        class="item"
-        v-for="(item, i) in list"
-        :style="`background-color: ${item.text.includes('partnership') ? '#f00' :''};`"
-      >
-        <span style="width: 50px">{{i}} <img :src="item.logo" alt="" style="width: 48px; height: 48px" /></span>
-        <span>{{item.user}} </span>
-        <span>{{item.time}}</span>
-        <span class="text">{{item.text}}</span>
-        <span>{{item.aites}}</span>
-        <img :src="item.imgs" alt="" style="width: 300px; height: 200px" />
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rico的</title>
+  <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/2.6.7/vue.min.js"></script>
+  <style>
+    .item {
+      border: 1px solid red;
+      margin-bottom: 10px;
+      display: flex;
+    }
+
+    .item span {
+      width: 220px;
+      padding: 10px;
+      border-right: 1px solid red;
+      overflow: hidden;
+    }
+
+    .text {
+      width: 300px;
+    }
+
+    .dropbtn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 16px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* 容器 <div> - 需要定位下拉内容 */
+
+    .content {
+      background-color: transparent;
+      /* width: 30px; */
+      /* height: 200px; */
+      /* background: #225f88; */
+    }
+
+    form select {
+      width: 162px;
+      /*宽*/
+      height: 40px;
+      /*高*/
+      background-color: #a3b5bb;
+      /*元素背景颜色*/
+      border: 1px solid #f1e8e8;
+      /*边框线*/
+      color: #ffffff;
+      /*字体颜色*/
+      outline: none;
+      /*去掉黑框*/
+      margin: 30px 10px 0 50px;
+      /*外边距*/
+      font-size: 16px;
+      /*字体大小*/
+    }
+
+    form option {
+      width: 160px;
+      height: 40px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    {{list.length}}<button onclick="exp()">筛选后请点击此处，导出给我</button>
+    <div class="item" v-for="(item, i) in list" :style="`background-color: ${item.cate ? '#f00' :''};`">
+      <span style="width: 50px">{{i}} <img :src="item.logo" alt="" style="width: 48px; height: 48px" /></span>
+      <span>{{item.user}} </span>
+      <span>{{item.time}}</span>
+      <span class="text">{{item.text}}</span>
+      <span>{{item.aites}}</span>
+      <img :src="item.imgs" alt="" style="width: 300px; height: 200px" />
+      <div class="content">
+        <form class="form1w">
+          <select id="tp" v-model="item.cate">
+            <option>nft</option>
+            <option>web3</option>
+            <option>元宇宙</option>
+            <option>gamefi</option>
+            <option>defi</option>
+            <option>media</option>
+            <option>dao</option>
+            <option></option>
+          </select>
+        </form>
       </div>
     </div>
     <script>
+
+      function exp() {
+        //
+
+
+        console.log(JSON.parse(localStorage.getItem('k')))
+
+        exportFile('文件', localStorage.getItem('k'))
+      }
+      function exportFile(filename = '文件.json', data = '') {
+        let link = document.createElement('a')
+        link.download = filename
+        if (typeof data !== 'string') {
+          data = JSON.stringify(data)
+        }
+
+        link.href = 'data:text/plain,' + encodeURIComponent(data)
+        link.click()
+      }
       fetch("./data.json")
         .then((res) => res.json())
         .then((list) => {
+          list = JSON.parse(localStorage.getItem('k')) || list.map(i => { i.cate = i.cate ? i.cate : ''; return i })
           new Vue({
             el: "#app",
             data: () => {
               return {
-                list,
+                list//: list.map(i => { i.cate = ''; return i }),
               };
             },
+
+            watch: {
+              list: {
+
+                deep: true, handler: () => {
+                  localStorage.setItem('k', JSON.stringify(list))
+                }
+              }
+            }
           });
         });
     </script>
-  </body>
+</body>
+
 </html>
