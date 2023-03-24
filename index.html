@@ -100,8 +100,7 @@
       function exp() {
         //
 
-
-        console.log(JSON.parse(localStorage.getItem('k')))
+ 
 
         exportFile('文件', localStorage.getItem('k'))
       }
@@ -119,6 +118,8 @@
         .then((res) => res.json())
         .then((list) => {
           list = JSON.parse(localStorage.getItem('k')) || list.map(i => { i.cate = i.cate ? i.cate : ''; return i })
+        list = list.filter(i => !i.user.includes('RetweetedDeBox@DeBox_Social'))
+          list = list.filter(i => !i.user.includes('RetweetedDeBox@DeBox_CN'))
           new Vue({
             el: "#app",
             data: () => {
